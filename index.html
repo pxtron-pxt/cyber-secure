@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Threat Analyzer</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <img src="team_logo.jpg" alt="Team Logo" class="logo" style="max-width: 200px; height: auto;">
+    <h2>Enter a Log Entry</h2>
+    <label for="logInput" class="sr-only">Log Entry Input</label>
+    <textarea id="logInput" rows="4" placeholder="Paste log entry here..."></textarea>
+    <button id="analyzeBtn">Analyze</button>
+    <p id="result"></p>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      analyzeBtn.addEventListener('click', checkThreat);
+    });
+
+    function checkThreat() {
+      const logEntry = encodeURIComponent(document.getElementById("logInput").value.trim());
+      const resultElement = document.getElementById("result");
+      
+      if (!logEntry) {
+        resultElement.textContent = "Please enter a log entry";
+        return;
+      }
+
+      fetch(`/detect/${logEntry}`)
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(data => {
+          resultElement.textContent = `Threat Level: ${data["Threat Level"] || 'Unknown'}`;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          resultElement.textContent = "Error analyzing threat. Please try again.";
+        });
+    }
+  </script>
+</body>
+</html>
